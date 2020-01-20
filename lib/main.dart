@@ -1,6 +1,5 @@
+import 'package:doit_app_client/job_map.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 
 void main() => runApp(MyApp());
 
@@ -24,41 +23,7 @@ class MyApp extends StatelessWidget {
         ),
         home: Scaffold(
           appBar: AppBar(title: Text("Jobs nearby")),
-          body: MapSample(),
+          body: JobMap(),
         ));
   }
-}
-
-class MapSample extends StatefulWidget {
-  @override
-  State<MapSample> createState() => MapSampleState();
-}
-
-class MapSampleState extends State<MapSample> {
-
-  final Geolocator _geolocator = Geolocator();
-  GoogleMapController mapController;
-
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<Position>(
-      future: _geolocator.getCurrentPosition(),
-      builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
-        return GoogleMap(
-          myLocationEnabled: true,
-          myLocationButtonEnabled: true,
-          onMapCreated: _onMapCreated,
-          initialCameraPosition: CameraPosition(
-            target: snapshot.hasData ? LatLng(snapshot.data.latitude, snapshot.data.longitude): LatLng(0.0, 0.0),
-            zoom: 11.0,
-          ),
-        );
-      },
-    );
-  }
-
 }
