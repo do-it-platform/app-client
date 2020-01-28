@@ -1,3 +1,4 @@
+import 'package:doit_app_client/job_card.dart';
 import 'package:doit_app_client/loading_widget.dart';
 import 'package:doit_app_client/search_api_client.dart';
 import 'package:flutter/material.dart';
@@ -27,12 +28,16 @@ class JobMapState extends State<JobMap> {
     return SearchResult(pos, nearByJobs);
   }
 
-  Set<Marker> _buildMarkers(List<Job> jobs) {
+  Set<Marker> _buildMarkers(List<Job> jobs, BuildContext context) {
     return jobs
         .map((j) => Marker(
             markerId: MarkerId(j.id),
             position: LatLng(j.latitude, j.longitude),
-            infoWindow: InfoWindow(title: j.title)))
+            infoWindow: InfoWindow(title: j.title),
+            onTap: () {
+              showModalBottomSheet(
+                  context: context, builder: (context) => JobCard(jobId: j.id));
+            }))
         .toSet();
   }
 
@@ -50,7 +55,7 @@ class JobMapState extends State<JobMap> {
               target: LatLng(currentPos.latitude, currentPos.longitude),
               zoom: 11.0,
             ),
-            markers: this._buildMarkers(searchResult.jobs),
+            markers: this._buildMarkers(searchResult.jobs, context),
           );
         });
   }

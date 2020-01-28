@@ -16,6 +16,17 @@ class SearchApiClient {
       }
     ''';
 
+  static final String _JOB_QUERY = r'''
+      query Jobs($id: ID!) {
+        job(id: $id) {
+          title
+          description
+          payment
+          createdAt
+        }
+      }
+    ''';
+
   Future<List<Job>> findNearByJobs(double lat, double lon) async {
     final queryResult = await _client.query(QueryOptions(
         fetchPolicy: FetchPolicy.noCache,
@@ -26,8 +37,20 @@ class SearchApiClient {
         .map((f) => Job(f['id'], f['title'], f['latitude'], f['longitude']))
         .toList();
   }
+
+  Future<JobDetails> findById(String id) async {
+    final queryResult = await _client.query(QueryOptions(
+        fetchPolicy: FetchPolicy.noCache,
+        documentNode: gql(_JOB_QUERY),
+        variables: <String, dynamic>{'id': id}));
+
+    final job = (queryResult.data['job'] as dynamic);
+    return JobDetails(
+        job['title'], job['description'], job['payment'], job['createdAt']);
+  }
 }
 
+// TODO json lib?
 class Job {
   final String id;
   final String title;
@@ -35,4 +58,13 @@ class Job {
   final double longitude;
 
   Job(this.id, this.title, this.latitude, this.longitude);
+}
+
+class JobDetails {
+  final String title;
+  final String description;
+  final String payment;
+  final String createdAt;
+
+  JobDetails(this.title, this.description, this.payment, this.createdAt);
 }
